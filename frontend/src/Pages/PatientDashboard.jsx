@@ -3,13 +3,15 @@ import { Context } from "../main";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaBell, FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
+import { FaBell, FaCheckCircle, FaTimesCircle, FaClock, FaCalendarAlt, FaBrain, FaHome } from "react-icons/fa";
+import AIAnalysis from "../components/AIAnalysis";
 
 const PatientDashboard = () => {
   const { isAuthenticated, user } = useContext(Context);
   const [appointments, setAppointments] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -85,7 +87,89 @@ const PatientDashboard = () => {
           <p style={{ fontSize: "18px", color: "#666" }}>Welcome back, {user?.firstName || "Patient"}! Manage your appointments at MediCare Plus Hospital.</p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Tab Navigation */}
+        <div style={{
+          display: "flex",
+          gap: "10px",
+          marginBottom: "30px",
+          borderBottom: "2px solid #e0e0e0",
+          paddingBottom: "0"
+        }}>
+          <button
+            onClick={() => setActiveTab("overview")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "15px 25px",
+              backgroundColor: activeTab === "overview" ? "#007bff" : "transparent",
+              color: activeTab === "overview" ? "white" : "#333",
+              border: "none",
+              borderRadius: "10px 10px 0 0",
+              fontSize: "16px",
+              fontWeight: activeTab === "overview" ? "bold" : "normal",
+              cursor: "pointer",
+              transition: "all 0.3s ease"
+            }}
+          >
+            <FaHome /> Overview
+          </button>
+          <button
+            onClick={() => setActiveTab("appointments")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "15px 25px",
+              backgroundColor: activeTab === "appointments" ? "#007bff" : "transparent",
+              color: activeTab === "appointments" ? "white" : "#333",
+              border: "none",
+              borderRadius: "10px 10px 0 0",
+              fontSize: "16px",
+              fontWeight: activeTab === "appointments" ? "bold" : "normal",
+              cursor: "pointer",
+              transition: "all 0.3s ease"
+            }}
+          >
+            <FaCalendarAlt /> Appointments
+          </button>
+          <button
+            onClick={() => setActiveTab("ai-analysis")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "15px 25px",
+              backgroundColor: activeTab === "ai-analysis" ? "#007bff" : "transparent",
+              color: activeTab === "ai-analysis" ? "white" : "#333",
+              border: "none",
+              borderRadius: "10px 10px 0 0",
+              fontSize: "16px",
+              fontWeight: activeTab === "ai-analysis" ? "bold" : "normal",
+              cursor: "pointer",
+              transition: "all 0.3s ease"
+            }}
+          >
+            <FaBrain /> AI Analysis
+          </button>
+        </div>
+
+        {/* AI Analysis Tab */}
+        {activeTab === "ai-analysis" && (
+          <div style={{
+            backgroundColor: "#fff",
+            borderRadius: "10px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            minHeight: "500px"
+          }}>
+            <AIAnalysis />
+          </div>
+        )}
+
+        {/* Overview Tab */}
+        {activeTab === "overview" && (
+          <>
+            {/* Stats Cards */}
         <div style={{ 
           display: "grid", 
           gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", 
@@ -227,7 +311,7 @@ const PatientDashboard = () => {
               Book New Appointment
             </button>
             <button
-              onClick={() => window.location.href = "/appointment"}
+              onClick={() => setActiveTab("appointments")}
               style={{
                 backgroundColor: "#28a745",
                 color: "white",
@@ -240,6 +324,24 @@ const PatientDashboard = () => {
               }}
             >
               View All Appointments
+            </button>
+            <button
+              onClick={() => setActiveTab("ai-analysis")}
+              style={{
+                backgroundColor: "#6f42c1",
+                color: "white",
+                border: "none",
+                padding: "15px 30px",
+                borderRadius: "5px",
+                fontSize: "16px",
+                cursor: "pointer",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px"
+              }}
+            >
+              <FaBrain /> AI Symptom Analysis
             </button>
           </div>
         </div>
@@ -293,6 +395,105 @@ const PatientDashboard = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+          </>
+        )}
+
+        {/* Appointments Tab */}
+        {activeTab === "appointments" && (
+          <div style={{
+            backgroundColor: "#fff",
+            borderRadius: "10px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            padding: "30px"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
+              <h2 style={{ fontSize: "24px", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
+                <FaCalendarAlt style={{ color: "#007bff" }} />
+                All Appointments
+              </h2>
+              <button
+                onClick={() => window.location.href = "/appointment"}
+                style={{
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  border: "none",
+                  padding: "12px 25px",
+                  borderRadius: "5px",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                + Book New Appointment
+              </button>
+            </div>
+
+            {loading ? (
+              <p>Loading appointments...</p>
+            ) : appointments.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 20px" }}>
+                <FaCalendarAlt style={{ fontSize: "60px", color: "#ddd", marginBottom: "20px" }} />
+                <p style={{ color: "#666", fontSize: "18px" }}>No appointments found.</p>
+                <p style={{ color: "#999", marginBottom: "20px" }}>Book your first appointment to get started!</p>
+                <button
+                  onClick={() => window.location.href = "/appointment"}
+                  style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    border: "none",
+                    padding: "15px 30px",
+                    borderRadius: "5px",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Book Appointment
+                </button>
+              </div>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid #ddd", backgroundColor: "#f8f9fa" }}>
+                      <th style={{ padding: "15px", textAlign: "left" }}>Doctor</th>
+                      <th style={{ padding: "15px", textAlign: "left" }}>Department</th>
+                      <th style={{ padding: "15px", textAlign: "left" }}>Date</th>
+                      <th style={{ padding: "15px", textAlign: "left" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointments.map((appointment) => (
+                      <tr key={appointment._id} style={{ borderBottom: "1px solid #eee" }}>
+                        <td style={{ padding: "15px" }}>
+                          Dr. {appointment.doctor.firstName} {appointment.doctor.lastName}
+                        </td>
+                        <td style={{ padding: "15px" }}>{appointment.department}</td>
+                        <td style={{ padding: "15px" }}>
+                          {new Date(appointment.appointment_date).toLocaleDateString()}
+                        </td>
+                        <td style={{ padding: "15px" }}>
+                          <span style={{
+                            padding: "5px 15px",
+                            borderRadius: "20px",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            backgroundColor: 
+                              appointment.status === "Accepted" ? "#28a745" :
+                              appointment.status === "Rejected" ? "#dc3545" : "#ffc107",
+                            color: appointment.status === "Pending" ? "#000" : "#fff"
+                          }}>
+                            {appointment.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
