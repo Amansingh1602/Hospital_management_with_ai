@@ -9,6 +9,8 @@ import messageRouter from "./router/messageRouter.js";
 import userRouter from "./router/userRouter.js";
 import appointmentRouter from "./router/appointmentRouter.js";
 import aiRouter from "./router/aiRouter.js";
+import aiRouterDemo from "./router/aiRouterDemo.js";
+import userRouterDemo from "./router/userRouterDemo.js";
 
 const app = express();
 config({ path: "./config.env" });
@@ -35,6 +37,8 @@ app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/appointment", appointmentRouter);
 app.use("/api/v1/ai", aiRouter);
+app.use("/api/v1/ai-demo", aiRouterDemo);
+app.use("/api/v1/user-demo", userRouterDemo);
 
 dbConnection();
 

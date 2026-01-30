@@ -19,30 +19,39 @@ const Register = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!firstName || !lastName || !email || !phone || !dob || !gender || !password) {
+      toast.error("Please fill in all fields!");
+      return;
+    }
+    
+    // Generate a dummy NIC for demo purposes
+    const nic = Math.random().toString().slice(2, 12);
+    
     try {
-      await axios
-        .post(
-          "http://localhost:4000/api/v1/user/patient/register",
-          { firstName, lastName, email, phone, dob, gender, password },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((res) => {
-          toast.success(res.data.message);
-          setIsAuthenticated(true);
-          navigateTo("/");
-          setFirstName("");
-          setLastName("");
-          setEmail("");
-          setPhone("");
-          setDob("");
-          setGender("");
-          setPassword("");
-        });
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/user-demo/patient/register-demo",
+        { firstName, lastName, email, phone, dob, gender, password, nic },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      
+      toast.success(response.data.message);
+      setIsAuthenticated(true);
+      navigateTo("/");
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone("");
+      setDob("");
+      setGender("");
+      setPassword("");
     } catch (error) {
-      toast.error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+      toast.error(errorMessage);
     }
   };
 

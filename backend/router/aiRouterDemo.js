@@ -1,7 +1,6 @@
 import express from "express";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/error.js";
-import { isPatientAuthenticatedDemo } from "../middlewares/authDemo.js";
 
 const router = express.Router();
 
@@ -180,10 +179,9 @@ function getFallbackAnalysis(symptoms) {
 // In-memory storage for symptom sessions (in production, use database)
 const symptomSessions = new Map();
 
-// Analyze symptoms endpoint
+// Demo analyze symptoms endpoint (no authentication required)
 router.post(
-  "/analyze",
-  isPatientAuthenticatedDemo,
+  "/analyze-demo",
   catchAsyncErrors(async (req, res, next) => {
     const {
       symptomsText,
@@ -239,7 +237,7 @@ router.post(
     const sessionId = Date.now().toString();
     const session = {
       _id: sessionId,
-      userId: req.user._id,
+      userId: "demo_user",
       symptomsText,
       severity,
       onset,
@@ -254,10 +252,10 @@ router.post(
       createdAt: new Date(),
     };
 
-    // Get or create user's sessions array
-    const userSessions = symptomSessions.get(req.user._id.toString()) || [];
-    userSessions.unshift(session);
-    symptomSessions.set(req.user._id.toString(), userSessions.slice(0, 50)); // Keep last 50 sessions
+    // Store in demo sessions
+    const demoSessions = symptomSessions.get("demo_user") || [];
+    demoSessions.unshift(session);
+    symptomSessions.set("demo_user", demoSessions.slice(0, 50)); // Keep last 50 sessions
 
     res.status(200).json({
       success: true,
@@ -268,18 +266,17 @@ router.post(
   })
 );
 
-// Get symptom history
+// Demo history endpoint
 router.get(
-  "/history",
-  isPatientAuthenticatedDemo,
+  "/history-demo",
   catchAsyncErrors(async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    const userSessions = symptomSessions.get(req.user._id.toString()) || [];
+    const demoSessions = symptomSessions.get("demo_user") || [];
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    const paginatedSessions = userSessions.slice(startIndex, endIndex);
+    const paginatedSessions = demoSessions.slice(startIndex, endIndex);
 
     res.status(200).json({
       success: true,
@@ -287,28 +284,9 @@ router.get(
       pagination: {
         page,
         limit,
-        total: userSessions.length,
-        pages: Math.ceil(userSessions.length / limit),
+        total: demoSessions.length,
+        pages: Math.ceil(demoSessions.length / limit),
       },
-    });
-  })
-);
-
-// Get single session
-router.get(
-  "/:id",
-  isPatientAuthenticatedDemo,
-  catchAsyncErrors(async (req, res, next) => {
-    const userSessions = symptomSessions.get(req.user._id.toString()) || [];
-    const session = userSessions.find((s) => s._id === req.params.id);
-
-    if (!session) {
-      return next(new ErrorHandler("Session not found", 404));
-    }
-
-    res.status(200).json({
-      success: true,
-      session,
     });
   })
 );

@@ -13,6 +13,7 @@ import axios from "axios";
 import { Context } from "./main";
 import Login from "./Pages/Login";
 import PatientDashboard from "./Pages/PatientDashboard";
+import AIDemo from "./Pages/AIDemo";
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, setUser } =
     useContext(Context);
@@ -21,7 +22,7 @@ const App = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/v1/user/patient/me",
+          "http://localhost:4000/api/v1/user-demo/patient/me-demo",
           {
             withCredentials: true,
           }
@@ -47,6 +48,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<PatientDashboard />} />
+          <Route path="/ai-demo" element={<AIDemo />} />
         </Routes>
         <Footer />
         <ToastContainer position="top-center" />
