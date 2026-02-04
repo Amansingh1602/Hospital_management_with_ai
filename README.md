@@ -52,6 +52,9 @@
 - ✅ Select preferred doctor and department
 - ✅ View appointment status
 - ✅ Send messages/inquiries
+- ✅ **AI-powered symptom analysis** (NEW)
+- ✅ **Medical triage recommendations** (NEW)
+- ✅ **Analysis history tracking** (NEW)
 
 ### 📅 Appointment Management
 - ✅ Book appointments with specific doctors
@@ -64,6 +67,21 @@
 - ✅ Contact form for inquiries
 - ✅ Message management
 - ✅ Patient-hospital communication
+
+### 🤖 AI-Powered Medical Triage (NEW)
+- ✅ Intelligent symptom analysis using Grok AI (Llama 3.3 70B model)
+- ✅ Real-time medical triage assessment (Emergency/Urgent/Scheduled/Self-care)
+- ✅ Personalized health recommendations based on symptoms
+- ✅ OTC medication suggestions with dosage and precautions
+- ✅ Home remedy recommendations
+- ✅ Dietary advice based on condition
+- ✅ Doctor specialization recommendations
+- ✅ Emergency contact information
+- ✅ Follow-up guidance and when to seek medical attention
+- ✅ Confidence scoring for AI predictions
+- ✅ Analysis history tracking
+- ✅ Age, gender, and condition-specific recommendations
+- ✅ Pregnancy-safe medical guidance
 
 ### 🗂️ File Management
 - ✅ Doctor profile photo uploads
@@ -79,6 +97,7 @@
 - **Framework:** Express.js
 - **Database:** MongoDB with Mongoose ODM
 - **Authentication:** JSON Web Tokens (JWT)
+- **AI Integration:** Grok AI (Groq API) with Llama 3.3 70B model
 - **File Upload:** express-fileupload
 - **Cloud Storage:** Cloudinary
 - **Security:** bcrypt, CORS, cookie-parser
@@ -120,6 +139,7 @@
 - **Node.js** (v14 or higher) - [Download](https://nodejs.org/)
 - **MongoDB** (Local or Atlas account) - [Get Started](https://www.mongodb.com/)
 - **Cloudinary Account** (Free tier) - [Sign Up](https://cloudinary.com/)
+- **Grok API Key** (Optional, for AI medical triage) - [Get API Key](https://console.groq.com/)
 
 ### Installation
 
@@ -174,6 +194,9 @@ COOKIE_EXPIRE=7
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# Grok AI Configuration (for Medical Triage)
+GROK_API_KEY=your_grok_api_key_here
 
 # Frontend URLs
 FRONTEND_URL_ONE=http://localhost:5173
@@ -304,6 +327,129 @@ hospital-management-system/
 | POST | `/send` | Public | Send message |
 | GET | `/getall` | Admin | Get all messages |
 
+### AI Analysis Routes (`/api/v1/ai/`)
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | `/analyze` | Patient | Analyze symptoms and get medical triage |
+| GET | `/history` | Patient | Get user's analysis history |
+| GET | `/check-config` | Public | Check AI service configuration status |
+
+---
+
+## 🤖 AI Medical Triage System
+
+### Overview
+
+The AI-powered medical triage system helps patients get immediate health guidance based on their symptoms. It uses advanced AI (Grok/Groq API with Llama 3.3 70B model) to analyze symptoms and provide comprehensive medical recommendations.
+
+### Key Features
+
+#### 1. **Intelligent Symptom Analysis**
+- Natural language processing of symptom descriptions
+- Considers severity, duration, onset, and patient demographics
+- Takes into account existing conditions, medications, and allergies
+- Special handling for vulnerable populations (children, elderly, pregnant)
+
+#### 2. **Smart Triage Levels**
+The AI categorizes cases into four priority levels:
+
+| Level | Description | Response Time | Color Code |
+|-------|-------------|---------------|------------|
+| 🔴 **Emergency** | Life-threatening symptoms | Immediate (Call 112) | Red |
+| 🟠 **Urgent Visit** | Serious symptoms | Within 24 hours | Orange |
+| 🟡 **See Doctor** | Moderate symptoms | Schedule appointment soon | Yellow |
+| 🟢 **Self Care** | Minor symptoms | Manageable at home | Green |
+
+#### 3. **Comprehensive Recommendations**
+
+The AI provides:
+
+- **Possible Conditions**: List of potential diagnoses with confidence scores
+- **OTC Medications**: Specific over-the-counter medicines with:
+  - Exact dosages and frequency
+  - Evidence level (Strong/Moderate/Supportive)
+  - Safety precautions and contraindications
+- **Home Remedies**: Evidence-based natural treatments
+- **What to Do**: Step-by-step action items
+- **What NOT to Do**: Important warnings and precautions
+- **Dietary Advice**: Nutrition recommendations for faster recovery
+- **Doctor Specialization**: Which type of doctor to consult
+- **Emergency Contacts**: Local emergency numbers with descriptions
+
+#### 4. **Safety Features**
+
+- ✅ **Age-based recommendations**: Tailored advice for children, adults, and elderly
+- ✅ **Pregnancy safety**: Automatic escalation and pregnancy-safe recommendations
+- ✅ **Drug interaction checks**: Considers current medications
+- ✅ **Allergy awareness**: Avoids contraindicated treatments
+- ✅ **Conservative approach**: When in doubt, escalates triage level
+- ✅ **Emergency detection**: Automatically flags life-threatening symptoms
+
+#### 5. **Analysis History**
+
+- Track all previous symptom analyses
+- Review past recommendations
+- Monitor health trends over time
+- Export analysis reports
+
+### How It Works
+
+```mermaid
+graph LR
+A[Patient Enters Symptoms] --> B[AI Analysis]
+B --> C[Triage Classification]
+C --> D[Generate Recommendations]
+D --> E[Display Results]
+E --> F[Save to History]
+```
+
+1. **Patient Input**: User enters symptoms with severity, demographics, and medical history
+2. **AI Processing**: Grok AI (Llama 3.3 70B) analyzes the data using medical knowledge
+3. **Triage Decision**: Assigns priority level based on urgency
+4. **Recommendations**: Generates personalized medical guidance
+5. **Follow-up**: Provides clear next steps and when to seek help
+
+### Example Analysis
+
+**Input:**
+```
+Symptoms: Persistent headache, mild fever, fatigue
+Severity: Moderate
+Age: 35, Gender: Male
+Duration: 2 days
+```
+
+**AI Output:**
+- **Triage Level**: See Doctor (Yellow)
+- **Possible Conditions**: Viral infection, Tension headache, Sinusitis
+- **Medicines**: Acetaminophen 500mg every 6 hours, stay hydrated
+- **Home Remedies**: Rest in dark room, cold compress, steam inhalation
+- **Doctor**: General Physician or ENT Specialist
+- **Follow-up**: If fever exceeds 102°F or symptoms worsen, seek immediate care
+
+### Technical Implementation
+
+- **Backend**: Express.js API endpoint at `/api/v1/ai/analyze`
+- **AI Model**: Llama 3.3 70B via Groq API
+- **Authentication**: JWT-protected, requires patient login
+- **Response Time**: < 5 seconds average
+- **Fallback**: Graceful degradation if AI service unavailable
+- **Storage**: In-memory session storage (can be extended to MongoDB)
+
+### Configuration
+
+Add to `backend/config.env`:
+```env
+GROK_API_KEY=your_grok_api_key_here
+```
+
+Get your free API key from [Groq Console](https://console.groq.com/)
+
+### Medical Disclaimer
+
+⚠️ **Important**: This AI tool is for educational and informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult qualified healthcare professionals for medical concerns.
+
 ---
 
 ## 🖼️ Screenshots
@@ -314,6 +460,7 @@ hospital-management-system/
 - Appointment booking form
 - Patient registration
 - Contact form
+- **AI Symptom Analyzer** (NEW)
 
 ### Admin Dashboard
 - Statistics overview
@@ -448,6 +595,10 @@ For more issues, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
 ## 🚧 Future Enhancements
 
+- [x] ✅ AI-powered symptom analysis and medical triage (COMPLETED)
+- [ ] Enhanced AI with medical image analysis
+- [ ] Multi-language support for AI recommendations
+- [ ] Integration with wearable health devices
 - [ ] Health Records (EHR) system
 - [ ] Medical report uploads (PDF, images)
 - [ ] Email notifications
@@ -457,6 +608,8 @@ For more issues, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 - [ ] Prescription management
 - [ ] Analytics dashboard
 - [ ] Mobile app
+- [ ] AI-powered appointment scheduling
+- [ ] Voice-enabled symptom input
 
 ---
 
@@ -507,6 +660,7 @@ Required environment variables in `backend/config.env`:
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary name | `your_cloud_name` |
 | `CLOUDINARY_API_KEY` | Cloudinary key | `123456789` |
 | `CLOUDINARY_API_SECRET` | Cloudinary secret | `abcdef...` |
+| `GROK_API_KEY` | Grok AI API key for medical triage | `gsk_...` |
 | `FRONTEND_URL_ONE` | Patient portal URL | `http://localhost:5173` |
 | `FRONTEND_URL_TWO` | Dashboard URL | `http://localhost:5174` |
 
